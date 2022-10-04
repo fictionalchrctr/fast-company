@@ -1,7 +1,7 @@
 import React from 'react'
 import User from './user'
 
-const Users = ({ users, handleDelete }) => {
+const Users = ({ users, handleDelete, handleToggleBookmark }) => {
   return (
     <>
       {users.length > 0 && (
@@ -19,7 +19,12 @@ const Users = ({ users, handleDelete }) => {
           </thead>
           <tbody>
             {users.map((user) => (
-              <User key={user._id} {...user} handleDelete={handleDelete} />
+              <User
+                key={user._id}
+                {...user}
+                handleDelete={handleDelete}
+                handleToggleBookmark={handleToggleBookmark}
+              />
             ))}
           </tbody>
         </table>

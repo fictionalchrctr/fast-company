@@ -10,10 +10,18 @@ function App() {
     setUsers(users.filter((user) => user._id !== userId))
   }
 
+  const handleToggleBookmark = (id) => {
+    console.log('Hey O')
+  }
+
   return (
     <div>
       <SearchStatus length={users.length} />
-      <Users users={users} handleDelete={handleDelete} />
+      <Users
+        users={users}
+        handleDelete={handleDelete}
+        handleToggleBookmark={handleToggleBookmark}
+      />
     </div>
   )
 }

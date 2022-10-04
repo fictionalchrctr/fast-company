@@ -1,5 +1,6 @@
 import React from 'react'
 import Qalitie from './qualitie'
+import BookMark from './bookmark'
 
 const User = ({
   _id,
@@ -9,6 +10,7 @@ const User = ({
   completedMeetings,
   rate,
   handleDelete,
+  handleToggleBookmark,
 }) => {
   return (
     <tr key={_id}>
@@ -22,7 +24,11 @@ const User = ({
       <td>{completedMeetings}</td>
       <td>{rate} /5</td>
       <td>
-        <button className='bi bi-bookmark btn-sm border-0'></button>
+        <BookMark
+          key={_id}
+          id={_id}
+          handleToggleBookmark={handleToggleBookmark}
+        />
       </td>
       <td>
         <button onClick={() => handleDelete(_id)} className='btn btn-danger'>
