@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SearchStatus = (length) => {
+const SearchStatus = ({ length }) => {
   const renderPhrase = (number) => {
     if (number > 4 && number < 15) return 'человек тусанет'
     if (number <= 4 && number >= 2) return 'человека тусанут'

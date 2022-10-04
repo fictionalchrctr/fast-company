@@ -12,8 +12,8 @@ function App() {
 
   return (
     <div>
-      {SearchStatus(users.length)}
-      <Users />
+      <SearchStatus length={users.length} />
+      <Users users={users} handleDelete={handleDelete} />
     </div>
   )
 }

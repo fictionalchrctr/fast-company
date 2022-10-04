@@ -1,7 +1,7 @@
 import React from 'react'
 import User from './user'
 
-const Users = ({ users, ...rest }) => {
+const Users = ({ users, handleDelete }) => {
   return (
     <>
       {users.length > 0 && (
@@ -19,7 +19,7 @@ const Users = ({ users, ...rest }) => {
           </thead>
           <tbody>
             {users.map((user) => (
-              <User key={user._id} />
+              <User key={user._id} {...user} handleDelete={handleDelete} />
             ))}
           </tbody>
         </table>
