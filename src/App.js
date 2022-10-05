@@ -10,9 +10,7 @@ function App() {
     setUsers(users.filter((user) => user._id !== userId))
   }
 
-  const handleToggleBookmark = (id) => {
-    console.log('Hey O')
-  }
+  const handleToggleBookmark = (id) => {}
 
   return (
     <div>
