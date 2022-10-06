@@ -10,7 +10,16 @@ function App() {
     setUsers(users.filter((user) => user._id !== userId))
   }
 
-  const handleToggleBookmark = (id) => {}
+  const handleToggleBookmark = (userId) => {
+    setUsers(
+      users.map((user) => {
+        if (user._id === userId) {
+          return { ...user, bookmark: !user.bookmark }
+        }
+        return user
+      })
+    )
+  }
 
   return (
     <div>

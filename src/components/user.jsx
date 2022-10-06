@@ -9,6 +9,7 @@ const User = ({
   profession,
   completedMeetings,
   rate,
+  bookmark,
   handleDelete,
   handleToggleBookmark,
 }) => {
@@ -25,7 +26,7 @@ const User = ({
       <td>{rate} /5</td>
       <td>
         <BookMark
-          key={_id}
+          status={bookmark}
           id={_id}
           handleToggleBookmark={handleToggleBookmark}
         />
