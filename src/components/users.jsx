@@ -1,7 +1,7 @@
 import React from 'react'
 import User from './user'
 
-const Users = ({ users, handleDelete, handleToggleBookmark }) => {
+const Users = ({ users, onDelete, onToggleBookmark }) => {
   return (
     <>
       {users.length > 0 && (
@@ -22,8 +22,8 @@ const Users = ({ users, handleDelete, handleToggleBookmark }) => {
               <User
                 key={user._id}
                 {...user}
-                handleDelete={handleDelete}
-                handleToggleBookmark={handleToggleBookmark}
+                onDelete={onDelete}
+                onToggleBookmark={onToggleBookmark}
               />
             ))}
           </tbody>
