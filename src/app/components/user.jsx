@@ -1,6 +1,7 @@
 import React from 'react'
 import Qalitie from './qualitie'
 import BookMark from './bookmark'
+import PropTypes from 'prop-types'
 
 const User = ({
   _id,
@@ -11,7 +12,7 @@ const User = ({
   rate,
   bookmark,
   onDelete,
-  onToggleBookmark,
+  onToggleBookmark
 }) => {
   return (
     <tr key={_id}>
@@ -32,12 +33,23 @@ const User = ({
         />
       </td>
       <td>
-        <button onClick={() => onDelete(_id)} className='btn btn-danger'>
-          delete
+        <button onClick={() => onDelete(_id)} className="btn btn-danger">
+          Delete
         </button>
       </td>
     </tr>
   )
+}
+User.propTypes = {
+  _id: PropTypes.any.isRequired,
+  name: PropTypes.string.isRequired,
+  qualities: PropTypes.any.isRequired,
+  profession: PropTypes.object.isRequired,
+  completedMeetings: PropTypes.number.isRequired,
+  rate: PropTypes.number.isRequired,
+  bookmark: PropTypes.bool.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onToggleBookmark: PropTypes.func.isRequired
 }
 
 export default User
