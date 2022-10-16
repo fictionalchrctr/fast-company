@@ -1,12 +1,21 @@
 import React, { useState } from 'react'
 import { paginate } from '../utils/paginate'
 import Pagination from './pagination'
+import api from '../api'
+import GroupList from './groupList'
+import PropTypes from 'prop-types'
 import User from './user'
 
 const Users = ({ users, onDelete, onToggleBookmark }) => {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [professions] = useState(api.professions.fetchAll())
   const count = users.length
   const pageSize = 4
-  const [currentPage, setCurrentPage] = useState(1)
+
+  const handleProffesionSelect = (params) => {
+    console.log(params)
+  }
+  console.log(professions)
   const handlePageChange = (pageIndex) => {
     console.log('page: ', pageIndex)
     setCurrentPage(pageIndex)
@@ -14,6 +23,7 @@ const Users = ({ users, onDelete, onToggleBookmark }) => {
   const userCrop = paginate(users, currentPage, pageSize)
   return (
     <>
+      <GroupList items={professions} onItemSelect={handleProffesionSelect} />
       {count > 0 && (
         <table className="table">
           <thead>
@@ -49,6 +59,11 @@ const Users = ({ users, onDelete, onToggleBookmark }) => {
       {/* users/pageSize */}
     </>
   )
+}
+Users.propTypes = {
+  users: PropTypes.array.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onToggleBookmark: PropTypes.func.isRequired
 }
 
 export default Users
