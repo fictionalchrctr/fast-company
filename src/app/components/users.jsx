@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { paginate } from '../utils/paginate'
 import Pagination from './pagination'
 import api from '../api'
@@ -8,22 +8,37 @@ import User from './user'
 
 const Users = ({ users, onDelete, onToggleBookmark }) => {
   const [currentPage, setCurrentPage] = useState(1)
-  const [professions] = useState(api.professions.fetchAll())
+  const [professions, setProfessions] = useState()
   const count = users.length
-  const pageSize = 4
+  const pageSize = 4 // по 4 пользователя на каждой странице
+
+  // при изменении состояния компонента вызывается консоль с помощтю хука useEffect
+  // хук useEffect нужен для отслеживания различных этапов компонента (монтирование в DOM, изменение, удаление)
+  useEffect(() => {
+    api.professions.fetchAll().then((data) => setProfessions(data))
+  }, []) // внутри [] может быть параметр за которым необходимо наблюдать
 
   const handleProffesionSelect = (params) => {
     console.log(params)
   }
-  console.log(professions)
+  // console.log(professions)
+
   const handlePageChange = (pageIndex) => {
-    console.log('page: ', pageIndex)
+    // console.log('page: ', pageIndex)
     setCurrentPage(pageIndex)
   }
-  const userCrop = paginate(users, currentPage, pageSize)
+  const userCrop = paginate(users, currentPage, pageSize) // разбиение пользователей на страницы
   return (
     <>
-      <GroupList items={professions} onItemSelect={handleProffesionSelect} />
+      {professions && (
+        <GroupList
+          items={professions}
+          onItemSelect={handleProffesionSelect}
+          contentProperty="name"
+          valueProperty="_id"
+        />
+      )}
+
       {count > 0 && (
         <table className="table">
           <thead>
