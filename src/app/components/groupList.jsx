@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 // GroupList = ProfessionList
 // items = professions
-// item = professiion
+// item = profession
 // [valueProperty] = ._id
 // [contentProperty] = .name
 
@@ -16,22 +16,42 @@ const GroupList = ({
 }) => {
   // console.log(items) // items - объект
   console.log(Object.keys(items)) // получаем МАССИВ ключей объекта items
-  return (
-    <ul className='list-group'>
-      {Object.keys(items).map((item) => (
-        <li
-          key={items[item][valueProperty]}
-          className={
-            'list-group-item' + (items[item] === selectedItem ? ' active' : '')
-          }
-          onClick={() => onItemSelect(items[item])}
-          role='button'
-        >
-          {items[item][contentProperty]}
-        </li>
-      ))}
-    </ul>
-  )
+  if (!Array.isArray(items)) {
+    return (
+      <ul className='list-group'>
+        {Object.keys(items).map((item) => (
+          <li
+            key={items[item][valueProperty]}
+            className={
+              'list-group-item' +
+              (items[item] === selectedItem ? ' active' : '')
+            }
+            onClick={() => onItemSelect(items[item])}
+            role='button'
+          >
+            {items[item][contentProperty]}
+          </li>
+        ))}
+      </ul>
+    )
+  } else {
+    return (
+      <ul className='list-group'>
+        {items.map((item) => (
+          <li
+            key={item[valueProperty]}
+            className={
+              'list-group-item' + (item === selectedItem ? ' active' : '')
+            }
+            onClick={() => onItemSelect(item)}
+            role='button'
+          >
+            {item[contentProperty]}
+          </li>
+        ))}
+      </ul>
+    )
+  }
 }
 GroupList.defaultProps = {
   valueProperty: '_id',

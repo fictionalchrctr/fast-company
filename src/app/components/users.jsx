@@ -42,7 +42,10 @@ const Users = ({ users, onDelete, onToggleBookmark }) => {
     setCurrentPage(pageIndex)
   }
   const filteredUsers = selectedProf
-    ? users.filter((user) => user.profession === selectedProf)
+    ? users.filter(
+        (user) =>
+          JSON.stringify(user.profession) === JSON.stringify(selectedProf)
+      )
     : users
   const count = filteredUsers.length
 
