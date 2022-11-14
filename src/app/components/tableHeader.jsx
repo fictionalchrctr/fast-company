@@ -1,15 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const TableHeader = (onSort, selectedSort, columns) => {
+const TableHeader = ({ onSort, selectedSort, columns }) => {
   const handleSort = (item) => {
-    if (selectedSort.iterator === item) {
+    if (selectedSort.path === item) {
       onSort({
         ...selectedSort,
         order: selectedSort.order === 'asc' ? 'desc' : 'asc'
       })
     } else {
-      onSort({ iterator: item, order: 'asc' })
+      onSort({ path: item, order: 'asc' })
     }
   }
   return (
@@ -18,11 +18,28 @@ const TableHeader = (onSort, selectedSort, columns) => {
         {Object.keys(columns).map((column) => (
           <th
             key={column}
-            onClick={() => handleSort(columns[column].iterator)}
+            onClick={
+              columns[column].path
+                ? () => handleSort(columns[column].path)
+                : undefined
+            }
+            role={columns[column].path && 'button'}
             scope='col'
+            // className={
+            //   'bi bi-caret' +
+            //   (selectedSort.order === 'asc' ? '-up-fill' : '-down-fill')
+            // }
           >
             {columns[column].name}
-            {/* {console.log(columns[column].iterator)} */}
+            {/* {
+              <i
+                className={
+                  'bi bi-caret' +
+                  (selectedSort.order === 'asc' ? '-up-fill' : '-down-fill')
+                }
+              ></i>
+            } */}
+            {/* {console.log(columns[column].path)} */}
           </th>
         ))}
         {/* <th onClick={() => handleSort('name')} scope='col'>

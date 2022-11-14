@@ -15,7 +15,7 @@ const GroupList = ({
   selectedItem
 }) => {
   // console.log(items) // items - объект
-  console.log(Object.keys(items)) // получаем МАССИВ ключей объекта items
+  // console.log(Object.keys(items)) // получаем МАССИВ ключей объекта items
   if (!Array.isArray(items)) {
     return (
       <ul className='list-group'>
