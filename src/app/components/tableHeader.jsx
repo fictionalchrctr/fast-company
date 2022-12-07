@@ -29,6 +29,13 @@ const TableHeader = ({ onSort, selectedSort, columns }) => {
             //   'bi bi-caret' +
             //   (selectedSort.order === 'asc' ? '-up-fill' : '-down-fill')
             // }
+            className={
+              selectedSort
+                ? selectedSort.order === 'asc'
+                  ? 'bi bi-caret-up-fill'
+                  : 'bi bi-caret-down-fill'
+                : undefined
+            }
           >
             {columns[column].name}
             {/* {
