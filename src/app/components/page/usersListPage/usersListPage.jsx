@@ -13,7 +13,7 @@ const UsersListPage = () => {
   const [professions, setProfessions] = useState()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedProf, setSelectedProf] = useState()
-  const [sortBy, setSortBy] = useState({ iterator: 'name', order: 'asc' })
+  const [sortBy, setSortBy] = useState({ path: 'name', order: 'asc' })
 
   const pageSize = 8 // по pageSize пользователя на каждой странице
 
@@ -88,6 +88,7 @@ const UsersListPage = () => {
             JSON.stringify(user.profession) === JSON.stringify(selectedProf)
         )
       : users
+
     const count = filteredUsers.length
 
     const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order])

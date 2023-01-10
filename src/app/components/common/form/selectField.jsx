@@ -5,42 +5,56 @@ const SelectField = ({
   label,
   value,
   defaultOption,
+  name,
   options,
   error,
   onChange
 }) => {
+  const handleChange = ({ target }) => {
+    onChange({ name: target.name, value: target.value })
+  }
   const getInputClasses = () => {
     return 'form-select' + (error ? ' is-invalid' : '')
   }
+  // const optionsArray =
+  //   !Array.isArray(options) && typeof options === 'object'
+  //     ? Object.keys(options).map((optionName) => ({
+  //         name: options[optionName].name,
+  //         value: options[optionName]._id
+  //       }))
+  //     : options
   const optionsArray =
     !Array.isArray(options) && typeof options === 'object'
-      ? Object.keys(options).map((optionName) => ({
-          name: options[optionName].name,
-          value: options[optionName]._id
-        }))
+      ? Object.values(options)
       : options
   return (
     <div className='mb-4'>
-      <label htmlFor='profession' className='form-label'>
+      <label htmlFor={name} className='form-label'>
         {label}
       </label>
       <select
         className={getInputClasses()}
-        id='profession'
-        name='profession'
+        id={name}
+        name={name}
         value={value} // data.profession
-        onChange={onChange} // handleChange
+        onChange={handleChange} // handleChange
       >
         <option disabled value=''>
           {defaultOption}
         </option>
-        {optionsArray &&
+        {/* {optionsArray &&
           optionsArray.map((option) => (
             <option
               value={option.value} // professions[professionName]._id
               key={option.value} // professions[professionName]._id
             >
               {option.name}
+            </option>
+          ))} */}
+        {optionsArray.length > 0 &&
+          optionsArray.map((option) => (
+            <option value={option.value} key={option.value}>
+              {option.label}
             </option>
           ))}
       </select>
@@ -53,6 +67,7 @@ SelectField.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string,
   defaultOption: PropTypes.string,
+  name: PropTypes.string,
   options: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   error: PropTypes.string,
   onChange: PropTypes.func

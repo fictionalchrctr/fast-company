@@ -1,8 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-// import User from './user'
-// import TableHeader from './tableHeader'
-// import TableBody from './tableBody'
 import BookMark from '../common/bookmark'
 import Qualities from './qualities'
 import Table from '../common/table'
@@ -56,9 +53,6 @@ const UsersTable = ({
       columns={columns}
       data={users}
     />
-    //   <TableHeader {...{ onSort, selectedSort, columns }} />
-    //   <TableBody {...{ data: users, columns }} />
-    // </Table>
   )
 }
 UsersTable.propTypes = {

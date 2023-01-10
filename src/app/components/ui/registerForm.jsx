@@ -4,25 +4,49 @@ import TextField from '../common/form/textField'
 import api from '../../api'
 import SelectField from '../common/form/selectField'
 import RadioField from '../common/form/radioField'
+import MultiSelectField from '../common/form/multiSelectField'
+import CheckBoxField from '../common/form/checkBoxField'
 
 const RegisterForm = () => {
   const [data, setData] = useState({
     email: '',
     password: '',
     profession: '',
-    sex: 'male'
+    sex: 'male',
+    qualities: [],
+    license: false
   })
-  const [professions, setProfessions] = useState()
+  const [qualities, setQualities] = useState([])
+  const [professions, setProfession] = useState([])
   const [errors, setErrors] = useState({})
 
+  // useEffect(() => {
+  //   api.professions.fetchAll().then((data) => setProfession(data))
+  //   api.qualities.fetchAll().then((data) => setQualities(data))
+  // }, [])
   useEffect(() => {
-    api.professions.fetchAll().then((data) => setProfessions(data))
+    api.professions.fetchAll().then((data) => {
+      const professionsList = Object.keys(data).map((professionName) => ({
+        label: data[professionName].name,
+        value: data[professionName]._id
+      }))
+      setProfession(professionsList)
+    })
+    api.qualities.fetchAll().then((data) => {
+      const qualitiesList = Object.keys(data).map((optionName) => ({
+        label: data[optionName].name,
+        value: data[optionName]._id,
+        color: data[optionName].color
+      }))
+      setQualities(qualitiesList)
+    })
   }, [])
 
-  const handleChange = (event) => {
+  const handleChange = (target) => {
+    console.log(target)
     setData((prevState) => ({
       ...prevState,
-      [event.target.name]: event.target.value
+      [target.name]: target.value
     }))
   }
 
@@ -46,6 +70,12 @@ const RegisterForm = () => {
     },
     profession: {
       isRequired: { message: 'Обязательно выберите вашу профессию' }
+    },
+    license: {
+      isRequired: {
+        message:
+          'Вы не можете использовать наш сервис без подтверждения лицензионного соглашения'
+      }
     }
   }
 
@@ -61,11 +91,46 @@ const RegisterForm = () => {
 
   const isValidForButton = Object.keys(errors).length === 0
 
+  const getProfessionById = (id) => {
+    for (const profession of professions) {
+      if (profession.value === id) {
+        return { _id: profession.value, name: profession.label }
+      }
+    }
+  }
+  const getQualities = (elements) => {
+    const qualitiesArray = []
+    for (const elem of elements) {
+      for (const quality in qualities) {
+        if (elem.value === qualities[quality].value) {
+          qualitiesArray.push({
+            _id: qualities[quality].value,
+            name: qualities[quality].label,
+            color: qualities[quality].color
+          })
+        }
+      }
+    }
+    return qualitiesArray
+  }
+
+  // const handleSubmit = (event) => {
+  //   event.preventDefault()
+  //   const isValid = validate()
+  //   if (!isValid) return
+  //   console.log(data)
+  // }
+
   const handleSubmit = (event) => {
     event.preventDefault()
     const isValid = validate()
     if (!isValid) return
-    console.log(data)
+    const { profession, qualities } = data
+    console.log({
+      ...data,
+      profession: getProfessionById(profession),
+      qualities: getQualities(qualities)
+    })
   }
   return (
     <form onSubmit={handleSubmit}>
@@ -89,6 +154,7 @@ const RegisterForm = () => {
         label='Выберите вашу профессию'
         value={data.profession}
         defaultOption='Choose...'
+        name='profession'
         options={professions}
         error={errors.profession}
         onChange={handleChange}
@@ -102,7 +168,23 @@ const RegisterForm = () => {
         value={data.sex}
         name='sex'
         onChange={handleChange}
+        label='Выберите ваш пол'
       />
+      <MultiSelectField
+        options={qualities}
+        onChange={handleChange}
+        defaultValue={data.qualities}
+        name='qualities'
+        label='Выберите ваши качества'
+      />
+      <CheckBoxField
+        value={data.license}
+        onChange={handleChange}
+        name='license'
+        error={errors.license}
+      >
+        Подтердить <a>лицензионное соглашение</a>
+      </CheckBoxField>
       <button
         type='submit'
         disabled={!isValidForButton}
