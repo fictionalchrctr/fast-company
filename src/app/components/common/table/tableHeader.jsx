@@ -12,7 +12,6 @@ const TableHeader = ({ onSort, selectedSort, columns }) => {
       onSort({ path: item, order: 'asc' })
     }
   }
-
   const renderSortArrow = (selectedSort, currentPath) => {
     if (selectedSort.path === currentPath) {
       if (selectedSort.order === 'asc') {
@@ -23,6 +22,7 @@ const TableHeader = ({ onSort, selectedSort, columns }) => {
     }
     return null
   }
+
   return (
     <thead>
       <tr>
@@ -37,7 +37,7 @@ const TableHeader = ({ onSort, selectedSort, columns }) => {
             role={columns[column].path && 'button'}
             scope='col'
           >
-            {columns[column].name}
+            {columns[column].name}{' '}
             {renderSortArrow(selectedSort, columns[column].path)}
           </th>
         ))}
@@ -45,7 +45,6 @@ const TableHeader = ({ onSort, selectedSort, columns }) => {
     </thead>
   )
 }
-
 TableHeader.propTypes = {
   onSort: PropTypes.func.isRequired,
   selectedSort: PropTypes.object.isRequired,
