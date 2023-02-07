@@ -7,6 +7,7 @@ import PropTypes from 'prop-types'
 import SearchStatus from '../../ui/searchStatus'
 import UsersTable from '../../ui/usersTable'
 import _ from 'lodash'
+import { UseUser } from '../../../hooks/useUsers'
 
 const UsersListPage = () => {
   const [currentPage, setCurrentPage] = useState(1)
@@ -14,28 +15,30 @@ const UsersListPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedProf, setSelectedProf] = useState()
   const [sortBy, setSortBy] = useState({ path: 'name', order: 'asc' })
+  // const [users, setUsers] = useState() // App
+  const { users } = UseUser()
+  console.log('users', users)
 
   const pageSize = 8 // по pageSize пользователя на каждой странице
 
-  const [users, setUsers] = useState() // App
-
-  useEffect(() => {
-    api.users.fetchAll().then((data) => setUsers(data))
-  }, [])
+  // useEffect(() => {
+  //   api.users.fetchAll().then((data) => setUsers(data))
+  // }, [])
 
   const handleDelete = (userId) => {
-    setUsers(users.filter((user) => user._id !== userId))
+    // setUsers(users.filter((user) => user._id !== userId))
+    console.log('handleDelete', userId)
   }
 
   const handleToggleBookmark = (userId) => {
-    setUsers(
-      users.map((user) => {
-        if (user._id === userId) {
-          return { ...user, bookmark: !user.bookmark }
-        }
-        return user
-      })
-    )
+    const newArray = users.map((user) => {
+      if (user._id === userId) {
+        return { ...user, bookmark: !user.bookmark }
+      }
+      return user
+    })
+    // setUsers(newArray)
+    console.log('handleToggleBookmark:', newArray)
   }
 
   // useEffect вызывается каждый раз когда мы монтируем что-то в DOM
