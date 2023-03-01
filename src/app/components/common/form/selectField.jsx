@@ -16,13 +16,6 @@ const SelectField = ({
   const getInputClasses = () => {
     return 'form-select' + (error ? ' is-invalid' : '')
   }
-  // const optionsArray =
-  //   !Array.isArray(options) && typeof options === 'object'
-  //     ? Object.keys(options).map((optionName) => ({
-  //         name: options[optionName].name,
-  //         value: options[optionName]._id
-  //       }))
-  //     : options
   const optionsArray =
     !Array.isArray(options) && typeof options === 'object'
       ? Object.values(options)
@@ -36,21 +29,12 @@ const SelectField = ({
         className={getInputClasses()}
         id={name}
         name={name}
-        value={value} // data.profession
-        onChange={handleChange} // handleChange
+        value={value}
+        onChange={handleChange}
       >
         <option disabled value=''>
           {defaultOption}
         </option>
-        {/* {optionsArray &&
-          optionsArray.map((option) => (
-            <option
-              value={option.value} // professions[professionName]._id
-              key={option.value} // professions[professionName]._id
-            >
-              {option.name}
-            </option>
-          ))} */}
         {optionsArray.length > 0 &&
           optionsArray.map((option) => (
             <option value={option.value} key={option.value}>

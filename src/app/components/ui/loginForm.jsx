@@ -2,18 +2,27 @@ import React, { useState, useEffect } from 'react'
 import { validator } from '../../utils/validator'
 import TextField from '../common/form/textField'
 import CheckBoxField from '../common/form/checkBoxField'
+import { useAuth } from '../../hooks/useAuth'
+import { useHistory } from 'react-router-dom'
 // import * as yup from 'yup'
 
 const LoginForm = () => {
+  const history = useHistory()
   const [data, setData] = useState({ email: '', password: '', stayOn: false })
+  const { logIn } = useAuth()
   const [errors, setErrors] = useState({})
+  const [enterError, setEnterError] = useState(null)
   const handleChange = (target) => {
     console.log(target)
     setData((prevState) => ({
       ...prevState,
       [target.name]: target.value
     }))
+    setEnterError(null)
   }
+  // console.log(process.env)
+
+  // ВАЛИДАЦИЯ ЧЕРЕЗ YUP
 
   // const validateScheme = yup.object().shape({
   //   password: yup
@@ -37,21 +46,10 @@ const LoginForm = () => {
 
   const validatorConfig = {
     email: {
-      isRequired: { message: 'Электронная почта обязательная для заполнения' },
-      isEmail: { message: 'Email введён некорректно' }
+      isRequired: { message: 'Электронная почта обязательная для заполнения' }
     },
     password: {
-      isRequired: { message: 'Пароль обязателен для заполнения' },
-      isCapitalSymbol: {
-        message: 'Пароль должен содержать хотя бы одну заглавную букву'
-      },
-      isContainDigit: {
-        message: 'Пароль должен содержать хотя бы одну цифру'
-      },
-      min: {
-        message: 'Пароль должен состоять минимум из 8 символов',
-        value: 8
-      }
+      isRequired: { message: 'Пароль обязателен для заполнения' }
     }
   }
 
@@ -71,11 +69,20 @@ const LoginForm = () => {
 
   const isValidForButton = Object.keys(errors).length === 0
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const isValid = validate()
     if (!isValid) return
     console.log(data)
+    try {
+      await logIn(data)
+      history.push(
+        history.location.state ? history.location.state.from.pathname : '/'
+      )
+      console.log()
+    } catch (error) {
+      setEnterError(error.message)
+    }
   }
   return (
     <form onSubmit={handleSubmit}>
@@ -98,9 +105,10 @@ const LoginForm = () => {
       <CheckBoxField value={data.stayOn} onChange={handleChange} name='stayOn'>
         Оставаться в системе
       </CheckBoxField>
+      {enterError && <p className='text-danger'>{enterError}</p>}
       <button
         type='submit'
-        disabled={!isValidForButton}
+        disabled={!isValidForButton || enterError}
         className='btn btn-primary w-100 mx-auto'
       >
         Submit

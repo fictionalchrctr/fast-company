@@ -1,26 +1,22 @@
 import { orderBy } from 'lodash'
-import React, { useEffect, useState } from 'react'
-import api from '../../api'
-import { useParams } from 'react-router-dom'
+import React from 'react'
 import CommentsList, { AddCommentForm } from '../common/comments'
+import { useComments } from '../../hooks/useComments'
 
 const Comments = () => {
-  const { userId } = useParams() // из параметров url забираем userId
-  const [comments, setComments] = useState([]) // добавляем состояние для массива комментариев
-  useEffect(() => {
-    api.comments
-      .fetchCommentsForUser(userId) // запрашиваем наши комменатрии для конкретного пользователя
-      .then((data) => setComments(data)) // устанавливаем комментарии в наше состояние
-  }, [])
+  const { comments, createComment, removeComment } = useComments()
+
   const handleSubmit = (data) => {
-    api.comments
-      .add({ ...data, pageId: userId }) // передаём данные из формы и передаём pageId, чтобы зафиксировать на какой странице этот комментарий должен тображаться
-      .then((data) => setComments([...comments, data])) // обновляем текущие данные комментариев (комментарии плюс новые комментарии (data))
+    createComment(data)
+    // api.comments
+    //   .add({ ...data, pageId: userId }) // передаём данные из формы и передаём pageId, чтобы зафиксировать на какой странице этот комментарий должен тображаться
+    //   .then((data) => setComments([...comments, data])) // обновляем текущие данные комментариев (комментарии плюс новые комментарии (data))
   }
   const handleRemoveComment = (id) => {
-    api.comments.remove(id).then((id) => {
-      setComments(comments.filter((x) => x._id !== id))
-    })
+    removeComment(id)
+    // api.comments.remove(id).then((id) => {
+    //   setComments(comments.filter((x) => x._id !== id))
+    // })
   }
   const sortedComments = orderBy(comments, ['created_at'], ['desc']) // комментарии необходимо отстортировать с помощью метода из лодаша
   return (

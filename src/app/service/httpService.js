@@ -1,11 +1,57 @@
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import config from '../config.json'
+import configFile from '../config.json'
+import { httpAuth } from '../hooks/useAuth'
+import localStorageService from './localStorageService'
 
-axios.defaults.baseURL = config.apiEndpoint
+const http = axios.create({
+  baseURL: configFile.apiEndpoint
+})
 
-axios.interceptors.request.use(
-  (response) => response, // обрабатывает удачный ответ сервера
+http.interceptors.request.use(
+  async function (config) {
+    if (configFile.isFireBase) {
+      const containSlash = /\/$/gi.test(config.url)
+      config.url =
+        (containSlash ? config.url.slice(0, -1) : config.url) + '.json'
+      const expiresDate = localStorageService.getTokenExpiresDate()
+      const refreshToken = localStorageService.getRefreshToken()
+      if (refreshToken && expiresDate < Date.now()) {
+        const { data } = await httpAuth.post('token', {
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken
+        })
+        localStorageService.setTokens({
+          refreshToken: data.refreshToken,
+          idToken: data.id_token,
+          expiresIn: data.expires_in,
+          localId: data.user_id
+        })
+      }
+      const accessToken = localStorageService.getAccessToken()
+      if (accessToken) {
+        config.params = { ...config.params, auth: accessToken }
+      }
+    }
+    return config
+  },
+  function (error) {
+    return Promise.reject(error)
+  }
+)
+
+function transformData(data) {
+  return data && !data._id
+    ? Object.keys(data).map((key) => ({ ...data[key] }))
+    : data
+}
+http.interceptors.response.use(
+  function (response) {
+    if (configFile.isFireBase) {
+      response.data = { content: transformData(response.data) } // в некоторых компонентах мы деструктуризируем content
+    }
+    return response
+  }, // обрабатывает удачный ответ сервера
   function (error) {
     const expectedErrors =
       error.response &&
@@ -21,10 +67,11 @@ axios.interceptors.request.use(
 )
 
 const httpService = {
-  get: axios.get,
-  post: axios.post,
-  put: axios.put,
-  delete: axios.delete
+  get: http.get,
+  post: http.post,
+  put: http.put,
+  delete: http.delete,
+  patch: http.patch
 }
 
 export default httpService

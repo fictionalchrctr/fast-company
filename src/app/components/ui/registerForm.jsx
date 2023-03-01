@@ -1,67 +1,113 @@
 import React, { useState, useEffect } from 'react'
 import { validator } from '../../utils/validator'
 import TextField from '../common/form/textField'
-import api from '../../api'
 import SelectField from '../common/form/selectField'
 import RadioField from '../common/form/radioField'
 import MultiSelectField from '../common/form/multiSelectField'
 import CheckBoxField from '../common/form/checkBoxField'
+import { useQualities } from '../../hooks/useQualities'
+import { useProfession } from '../../hooks/useProfession'
+import { useAuth } from '../../hooks/useAuth'
+import { useHistory } from 'react-router-dom'
 
 const RegisterForm = () => {
+  const history = useHistory()
   const [data, setData] = useState({
     email: '',
     password: '',
     profession: '',
     sex: 'male',
+    name: '',
     qualities: [],
     license: false
   })
-  const [qualities, setQualities] = useState([])
-  const [professions, setProfession] = useState([])
+  const { signUp } = useAuth()
+  const { qualities } = useQualities()
+  const qualitiesList = qualities.map((qual) => ({
+    label: qual.name,
+    value: qual._id
+  }))
+  const { professions } = useProfession()
+  const professionsList = professions.map((prof) => ({
+    label: prof.name,
+    value: prof._id
+  }))
+
   const [errors, setErrors] = useState({})
 
-  // useEffect(() => {
-  //   api.professions.fetchAll().then((data) => setProfession(data))
-  //   api.qualities.fetchAll().then((data) => setQualities(data))
-  // }, [])
-  useEffect(() => {
-    api.professions.fetchAll().then((data) => {
-      const professionsList = Object.keys(data).map((professionName) => ({
-        label: data[professionName].name,
-        value: data[professionName]._id
-      }))
-      setProfession(professionsList)
-    })
-    api.qualities.fetchAll().then((data) => {
-      const qualitiesList = Object.keys(data).map((optionName) => ({
-        label: data[optionName].name,
-        value: data[optionName]._id,
-        color: data[optionName].color
-      }))
-      setQualities(qualitiesList)
-    })
-  }, [])
+  // const getProfessionById = (id) => {
+  //   for (const prof of professions) {
+  //     if (prof.value === id) {
+  //       return { _id: prof.value, name: prof.label }
+  //     }
+  //   }
+  // }
+  // const getQualities = (elements) => {
+  //   const qualitiesArray = []
+  //   for (const elem of elements) {
+  //     for (const quality in qualities) {
+  //       if (elem.value === qualities[quality].value) {
+  //         qualitiesArray.push({
+  //           _id: qualities[quality].value,
+  //           name: qualities[quality].label,
+  //           color: qualities[quality].color
+  //         })
+  //       }
+  //     }
+  //   }
+  //   return qualitiesArray
+  // }
 
+  // useEffect(() => {
+  //   api.professions.fetchAll().then((data) => {
+  //     const professionsList = Object.keys(data).map((professionName) => ({
+  //       label: data[professionName].name,
+  //       value: data[professionName]._id
+  //     }))
+  //     setProfession(professionsList)
+  //   })
+  //   api.qualities.fetchAll().then((data) => {
+  //     const qualitiesList = Object.keys(data).map((optionName) => ({
+  //       value: data[optionName]._id,
+  //       label: data[optionName].name,
+  //       color: data[optionName].color
+  //     }))
+  //     setQualities(qualitiesList)
+  //   })
+  // }, [])
   const handleChange = (target) => {
-    console.log(target)
     setData((prevState) => ({
       ...prevState,
       [target.name]: target.value
     }))
   }
-
   const validatorConfig = {
     email: {
-      isRequired: { message: 'Электронная почта обязательная для заполнения' },
-      isEmail: { message: 'Email введён некорректно' }
+      isRequired: {
+        message: 'Электронная почта обязательна для заполнения'
+      },
+      isEmail: {
+        message: 'Email введен некорректно'
+      }
+    },
+    name: {
+      isRequired: {
+        message: 'Имя обязательно для заполнения'
+      },
+      min: {
+        message: 'Имя должно состоять минимум из 2 символов',
+        value: 2
+      }
     },
     password: {
-      isRequired: { message: 'Пароль обязателен для заполнения' },
+      isRequired: {
+        message: 'Пароль обязателен для заполнения'
+      },
       isCapitalSymbol: {
         message: 'Пароль должен содержать хотя бы одну заглавную букву'
       },
       isContainDigit: {
-        message: 'Пароль должен содержать хотя бы одну цифру'
+        message: 'Пароль должен содержать хотя бы одно число'
       },
       min: {
         message: 'Пароль должен состоять минимум из 8 символов',
@@ -69,7 +115,9 @@ const RegisterForm = () => {
       }
     },
     profession: {
-      isRequired: { message: 'Обязательно выберите вашу профессию' }
+      isRequired: {
+        message: 'Обязательно выберите вашу профессию'
+      }
     },
     license: {
       isRequired: {
@@ -78,7 +126,6 @@ const RegisterForm = () => {
       }
     }
   }
-
   useEffect(() => {
     validate()
   }, [data])
@@ -89,58 +136,39 @@ const RegisterForm = () => {
     return Object.keys(errors).length === 0
   }
 
-  const isValidForButton = Object.keys(errors).length === 0
+  const isValid = Object.keys(errors).length === 0
 
-  const getProfessionById = (id) => {
-    for (const profession of professions) {
-      if (profession.value === id) {
-        return { _id: profession.value, name: profession.label }
-      }
-    }
-  }
-  const getQualities = (elements) => {
-    const qualitiesArray = []
-    for (const elem of elements) {
-      for (const quality in qualities) {
-        if (elem.value === qualities[quality].value) {
-          qualitiesArray.push({
-            _id: qualities[quality].value,
-            name: qualities[quality].label,
-            color: qualities[quality].color
-          })
-        }
-      }
-    }
-    return qualitiesArray
-  }
-
-  // const handleSubmit = (event) => {
-  //   event.preventDefault()
-  //   const isValid = validate()
-  //   if (!isValid) return
-  //   console.log(data)
-  // }
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const isValid = validate()
     if (!isValid) return
-    const { profession, qualities } = data
-    console.log({
+    const newData = {
       ...data,
-      profession: getProfessionById(profession),
-      qualities: getQualities(qualities)
-    })
+      qualities: data.qualities.map((qual) => qual.value)
+    }
+    try {
+      await signUp(newData)
+      history.push('/')
+    } catch (error) {
+      setErrors(error)
+    }
   }
+
   return (
     <form onSubmit={handleSubmit}>
       <TextField
         label='Электронная почта'
-        // type='text'
         name='email'
         value={data.email}
         onChange={handleChange}
         error={errors.email}
+      />
+      <TextField
+        label='Имя'
+        name='name'
+        value={data.name}
+        onChange={handleChange}
+        error={errors.name}
       />
       <TextField
         label='Пароль'
@@ -151,13 +179,13 @@ const RegisterForm = () => {
         error={errors.password}
       />
       <SelectField
-        label='Выберите вашу профессию'
-        value={data.profession}
+        label='Выбери свою профессию'
         defaultOption='Choose...'
+        options={professionsList}
         name='profession'
-        options={professions}
-        error={errors.profession}
         onChange={handleChange}
+        value={data.profession}
+        error={errors.profession}
       />
       <RadioField
         options={[
@@ -171,7 +199,7 @@ const RegisterForm = () => {
         label='Выберите ваш пол'
       />
       <MultiSelectField
-        options={qualities}
+        options={qualitiesList}
         onChange={handleChange}
         defaultValue={data.qualities}
         name='qualities'
@@ -183,12 +211,12 @@ const RegisterForm = () => {
         name='license'
         error={errors.license}
       >
-        Подтердить <a>лицензионное соглашение</a>
+        Подтвердить <a>лицензионное соглашение</a>
       </CheckBoxField>
       <button
-        type='submit'
-        disabled={!isValidForButton}
         className='btn btn-primary w-100 mx-auto'
+        type='submit'
+        disabled={!isValid}
       >
         Submit
       </button>

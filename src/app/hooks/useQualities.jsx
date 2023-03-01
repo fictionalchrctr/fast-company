@@ -18,17 +18,6 @@ export const QualitiesProvider = ({ children }) => {
     getQualitiesList()
   }, [])
 
-  useEffect(() => {
-    if (error !== null) {
-      toast(error)
-      setError(null)
-    }
-  }, [error])
-
-  const getQuality = (id) => {
-    return qualities.find((quality) => quality._id === id)
-  }
-
   async function getQualitiesList() {
     try {
       const { content } = await qualitiesService.fetchAll()
@@ -38,6 +27,17 @@ export const QualitiesProvider = ({ children }) => {
       errorCatcher(error)
     }
   }
+
+  const getQuality = (id) => {
+    return qualities.find((quality) => quality._id === id)
+  }
+
+  useEffect(() => {
+    if (error !== null) {
+      toast(error)
+      setError(null)
+    }
+  }, [error])
 
   function errorCatcher(error) {
     const { message } = error.response.data

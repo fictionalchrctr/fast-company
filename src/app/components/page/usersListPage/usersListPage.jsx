@@ -1,34 +1,32 @@
 import React, { useState, useEffect } from 'react'
 import { paginate } from '../../../utils/paginate'
 import Pagination from '../../common/pagination'
-import api from '../../../api'
+// import api from '../../../api'
 import GroupList from '../../common/groupList'
 import PropTypes from 'prop-types'
 import SearchStatus from '../../ui/searchStatus'
 import UsersTable from '../../ui/usersTable'
 import _ from 'lodash'
 import { UseUser } from '../../../hooks/useUsers'
+import { useProfession } from '../../../hooks/useProfession'
+import { useAuth } from '../../../hooks/useAuth'
 
 const UsersListPage = () => {
+  const { users } = UseUser()
+  const { currentUser } = useAuth()
+  const { professions, isLoading: professionsLoading } = useProfession()
   const [currentPage, setCurrentPage] = useState(1)
-  const [professions, setProfessions] = useState()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedProf, setSelectedProf] = useState()
   const [sortBy, setSortBy] = useState({ path: 'name', order: 'asc' })
   // const [users, setUsers] = useState() // App
-  const { users } = UseUser()
-  console.log('users', users)
 
   const pageSize = 8 // по pageSize пользователя на каждой странице
 
-  // useEffect(() => {
-  //   api.users.fetchAll().then((data) => setUsers(data))
-  // }, [])
-
-  const handleDelete = (userId) => {
-    // setUsers(users.filter((user) => user._id !== userId))
-    console.log('handleDelete', userId)
-  }
+  // const handleDelete = (userId) => {
+  //   // setUsers(users.filter((user) => user._id !== userId))
+  //   console.log('handleDelete', userId)
+  // }
 
   const handleToggleBookmark = (userId) => {
     const newArray = users.map((user) => {
@@ -43,11 +41,6 @@ const UsersListPage = () => {
 
   // useEffect вызывается каждый раз когда мы монтируем что-то в DOM
   // хук useEffect нужен для отслеживания различных этапов компонента (монтирование в DOM, изменение, удаление)
-
-  useEffect(() => {
-    // console.log('send request')
-    api.professions.fetchAll().then((data) => setProfessions(data))
-  }, [])
 
   useEffect(() => {
     setCurrentPage(1)
@@ -79,77 +72,72 @@ const UsersListPage = () => {
     setSortBy(item)
   }
 
-  if (users) {
+  function filterUsers(data) {
     const filteredUsers = searchQuery
-      ? users.filter(
+      ? data.filter(
           (user) =>
             user.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1
         )
       : selectedProf
-      ? users.filter(
+      ? data.filter(
           (user) =>
             JSON.stringify(user.profession) === JSON.stringify(selectedProf)
         )
-      : users
+      : data
+    return filteredUsers.filter((user) => user._id !== currentUser._id)
+  } // отображение всех пользователей кроме текущего
 
-    const count = filteredUsers.length
+  const filteredUsers = filterUsers(users)
+  const count = filteredUsers.length
+  const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order])
+  const userCrop = paginate(sortedUsers, currentPage, pageSize) // разбиение пользователей на страницы
+  const clearFilter = () => {
+    setSelectedProf()
+  }
 
-    const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order])
-
-    const userCrop = paginate(sortedUsers, currentPage, pageSize) // разбиение пользователей на страницы
-
-    const clearFilter = () => {
-      setSelectedProf()
-    }
-
-    return (
-      <div className='d-flex'>
-        {professions && (
-          <div className='d-flex flex-column flex-shrink-0 p-3'>
-            <GroupList
-              selectedItem={selectedProf}
-              items={professions}
-              onItemSelect={handleProffesionSelect}
-              // contentProperty='name'
-              // valueProperty='_id'
-            />
-            <button className='btn btn-secondary mt-2' onClick={clearFilter}>
-              {' '}
-              Сброс{' '}
-            </button>
-          </div>
-        )}
-        <div className='d-flex flex-column'>
-          <SearchStatus length={count} />
-          <input
-            type='text'
-            name='searchQuery'
-            placeholder='Search...'
-            onChange={handleSearchQuery}
-            value={searchQuery}
+  return (
+    <div className='d-flex'>
+      {professions && !professionsLoading && (
+        <div className='d-flex flex-column flex-shrink-0 p-3'>
+          <GroupList
+            selectedItem={selectedProf}
+            items={professions}
+            onItemSelect={handleProffesionSelect}
           />
-          {count > 0 && (
-            <UsersTable
-              onSort={handleSort}
-              users={userCrop}
-              selectedSort={sortBy}
-              onDelete={handleDelete}
-              onToggleBookmark={handleToggleBookmark}
-            />
-          )}
-          <div className='d-flex justify-content-center'>
-            <Pagination
-              itemsCount={count}
-              pageSize={pageSize}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-            />
-          </div>
+          <button className='btn btn-secondary mt-2' onClick={clearFilter}>
+            {' '}
+            Сброс{' '}
+          </button>
+        </div>
+      )}
+      <div className='d-flex flex-column'>
+        <SearchStatus length={count} />
+        <input
+          type='text'
+          name='searchQuery'
+          placeholder='Search...'
+          onChange={handleSearchQuery}
+          value={searchQuery}
+        />
+        {count > 0 && (
+          <UsersTable
+            onSort={handleSort}
+            users={userCrop}
+            selectedSort={sortBy}
+            onToggleBookmark={handleToggleBookmark}
+          />
+        )}
+        <div className='d-flex justify-content-center'>
+          <Pagination
+            itemsCount={count}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
-    )
-  }
-  return 'loading...'
+    </div>
+  )
 }
 UsersListPage.propTypes = {
   users: PropTypes.array
