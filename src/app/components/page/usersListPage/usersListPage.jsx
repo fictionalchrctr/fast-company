@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { paginate } from '../../../utils/paginate'
 import Pagination from '../../common/pagination'
-// import api from '../../../api'
 import GroupList from '../../common/groupList'
 import PropTypes from 'prop-types'
 import SearchStatus from '../../ui/searchStatus'
 import UsersTable from '../../ui/usersTable'
 import _ from 'lodash'
 import { UseUser } from '../../../hooks/useUsers'
-import { useProfession } from '../../../hooks/useProfession'
 import { useAuth } from '../../../hooks/useAuth'
+import { useSelector } from 'react-redux'
+import {
+  getProfessions,
+  getProfessionsLoadingStatus
+} from '../../../store/professions'
 
 const UsersListPage = () => {
   const { users } = UseUser()
   const { currentUser } = useAuth()
-  const { professions, isLoading: professionsLoading } = useProfession()
+  const professions = useSelector(getProfessions())
+  const professionsLoading = useSelector(getProfessionsLoadingStatus())
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedProf, setSelectedProf] = useState()

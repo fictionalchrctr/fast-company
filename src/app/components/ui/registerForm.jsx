@@ -5,10 +5,12 @@ import SelectField from '../common/form/selectField'
 import RadioField from '../common/form/radioField'
 import MultiSelectField from '../common/form/multiSelectField'
 import CheckBoxField from '../common/form/checkBoxField'
-import { useQualities } from '../../hooks/useQualities'
-import { useProfession } from '../../hooks/useProfession'
+
 import { useAuth } from '../../hooks/useAuth'
 import { useHistory } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { getQualities } from '../../store/qualities'
+import { getProfessions } from '../../store/professions'
 
 const RegisterForm = () => {
   const history = useHistory()
@@ -22,12 +24,12 @@ const RegisterForm = () => {
     license: false
   })
   const { signUp } = useAuth()
-  const { qualities } = useQualities()
+  const qualities = useSelector(getQualities())
   const qualitiesList = qualities.map((qual) => ({
     label: qual.name,
     value: qual._id
   }))
-  const { professions } = useProfession()
+  const professions = useSelector(getProfessions())
   const professionsList = professions.map((prof) => ({
     label: prof.name,
     value: prof._id
@@ -35,46 +37,6 @@ const RegisterForm = () => {
 
   const [errors, setErrors] = useState({})
 
-  // const getProfessionById = (id) => {
-  //   for (const prof of professions) {
-  //     if (prof.value === id) {
-  //       return { _id: prof.value, name: prof.label }
-  //     }
-  //   }
-  // }
-  // const getQualities = (elements) => {
-  //   const qualitiesArray = []
-  //   for (const elem of elements) {
-  //     for (const quality in qualities) {
-  //       if (elem.value === qualities[quality].value) {
-  //         qualitiesArray.push({
-  //           _id: qualities[quality].value,
-  //           name: qualities[quality].label,
-  //           color: qualities[quality].color
-  //         })
-  //       }
-  //     }
-  //   }
-  //   return qualitiesArray
-  // }
-
-  // useEffect(() => {
-  //   api.professions.fetchAll().then((data) => {
-  //     const professionsList = Object.keys(data).map((professionName) => ({
-  //       label: data[professionName].name,
-  //       value: data[professionName]._id
-  //     }))
-  //     setProfession(professionsList)
-  //   })
-  //   api.qualities.fetchAll().then((data) => {
-  //     const qualitiesList = Object.keys(data).map((optionName) => ({
-  //       value: data[optionName]._id,
-  //       label: data[optionName].name,
-  //       color: data[optionName].color
-  //     }))
-  //     setQualities(qualitiesList)
-  //   })
-  // }, [])
   const handleChange = (target) => {
     setData((prevState) => ({
       ...prevState,

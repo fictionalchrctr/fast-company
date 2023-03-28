@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { validator } from '../../../utils/validator'
-// import api from '../../../api'
 import TextField from '../../common/form/textField'
 import SelectField from '../../common/form/selectField'
 import RadioField from '../../common/form/radioField'
 import MultiSelectField from '../../common/form/multiSelectField'
 import BackHistoryButton from '../../common/backButton'
 import { useAuth } from '../../../hooks/useAuth'
-import { useProfession } from '../../../hooks/useProfession'
-import { useQualities } from '../../../hooks/useQualities'
+
+import { useSelector } from 'react-redux'
+import {
+  getQualities,
+  getQualitiesLoadingStatus
+} from '../../../store/qualities'
+import {
+  getProfessions,
+  getProfessionsLoadingStatus
+} from '../../../store/professions'
 
 // параметр setLoading нужен для того, чтобы форма отобразилась в тот момент, когда все данные загружены
 
@@ -18,17 +25,23 @@ const EditUserPage = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [data, setData] = useState() // храение текущего состояния формы
   const { currentUser, updateUserData } = useAuth()
-  const { professions, isLoading: professionsLoading } = useProfession()
-  const { qualities, isLoading: qualitiesLoading } = useQualities()
-  const [errors, setErrors] = useState({})
-  const professionsList = professions.map((prof) => ({
-    label: prof.name,
-    value: prof._id
-  }))
+
+  const qualities = useSelector(getQualities())
+  const qualitiesLoading = useSelector(getQualitiesLoadingStatus())
+
   const qualitiesList = qualities.map((qual) => ({
     label: qual.name,
     value: qual._id
   }))
+
+  const professions = useSelector(getProfessions())
+  const professionsLoading = useSelector(getProfessionsLoadingStatus())
+  const professionsList = professions.map((prof) => ({
+    label: prof.name,
+    value: prof._id
+  }))
+
+  const [errors, setErrors] = useState({})
   const handleSubmit = async (e) => {
     e.preventDefault()
     const isValid = validate()
