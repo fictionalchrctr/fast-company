@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
 import { validator } from '../../../utils/validator'
 import TextField from '../../common/form/textField'
 import SelectField from '../../common/form/selectField'
 import RadioField from '../../common/form/radioField'
 import MultiSelectField from '../../common/form/multiSelectField'
 import BackHistoryButton from '../../common/backButton'
-import { useAuth } from '../../../hooks/useAuth'
 
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   getQualities,
   getQualitiesLoadingStatus
@@ -17,40 +15,39 @@ import {
   getProfessions,
   getProfessionsLoadingStatus
 } from '../../../store/professions'
+import { getCurrentUserData, updateUser } from '../../../store/users'
 
 // параметр setLoading нужен для того, чтобы форма отобразилась в тот момент, когда все данные загружены
 
 const EditUserPage = () => {
-  const history = useHistory() // выполнение редиректа после успешного выполнения формы
   const [isLoading, setIsLoading] = useState(true)
   const [data, setData] = useState() // храение текущего состояния формы
-  const { currentUser, updateUserData } = useAuth()
-
+  const dispatch = useDispatch()
+  const currentUser = useSelector(getCurrentUserData())
   const qualities = useSelector(getQualities())
   const qualitiesLoading = useSelector(getQualitiesLoadingStatus())
-
   const qualitiesList = qualities.map((qual) => ({
     label: qual.name,
     value: qual._id
   }))
-
   const professions = useSelector(getProfessions())
   const professionsLoading = useSelector(getProfessionsLoadingStatus())
   const professionsList = professions.map((prof) => ({
     label: prof.name,
     value: prof._id
   }))
-
   const [errors, setErrors] = useState({})
-  const handleSubmit = async (e) => {
+
+  const handleSubmit = (e) => {
     e.preventDefault()
     const isValid = validate()
     if (!isValid) return
-    await updateUserData({
-      ...data,
-      qualities: data.qualities.map((q) => q.value)
-    })
-    history.push(`/users/${currentUser._id}`)
+    dispatch(
+      updateUser({
+        ...data,
+        qualities: data.qualities.map((q) => q.value)
+      })
+    )
   }
 
   function getQualitiesListByIds(qualitiesIds) {

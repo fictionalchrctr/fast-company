@@ -2,9 +2,10 @@ import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { toast } from 'react-toastify'
 import { useParams } from 'react-router-dom'
-import { useAuth } from './useAuth'
 import { nanoid } from 'nanoid'
 import commentService from '../service/commentService'
+import { useSelector } from 'react-redux'
+import { getCurrenUserId } from '../store/users'
 
 const CommentsContext = React.createContext()
 
@@ -14,7 +15,8 @@ export const useComments = () => {
 
 const CommentsProvider = ({ children }) => {
   const { userId } = useParams() // из параметров url забираем userId
-  const { currentUser } = useAuth()
+
+  const currentUserId = useSelector(getCurrenUserId())
   const [isLoading, setIsLoading] = useState(true) // проверка на загрузку в самих компонентах
   const [comments, setComments] = useState([])
   const [error, setError] = useState(null)
@@ -37,7 +39,7 @@ const CommentsProvider = ({ children }) => {
       _id: nanoid(), // id комментария
       pageId: userId,
       created_at: Date.now(),
-      userId: currentUser._id
+      userId: currentUserId
     }
     try {
       const { content } = await commentService.createComment(comment)

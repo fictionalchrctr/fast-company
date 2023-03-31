@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import professionService from '../service/professiomService'
+import isOutDated from '../utils/isOutdated'
 
 const professionsSlice = createSlice({
   name: 'professions',
@@ -31,12 +32,6 @@ const professionsSlice = createSlice({
 const { reducer: professionsReducer, actions } = professionsSlice
 const { professionsRequested, professionsRecieved, professionsRequestFailed } =
   actions
-
-function isOutDated(date) {
-  if (Date.now() - date > 10 * 60 * 1000) {
-    return true
-  } else return false
-}
 
 export function loadProfessionsList() {
   return async function (dispatch, getState) {

@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { displayDate } from '../../../utils/displayDate'
-import { UseUser } from '../../../hooks/useUsers'
-import { useAuth } from '../../../hooks/useAuth'
+import { getCurrenUserId, getUserById } from '../../../store/users'
+import { useSelector } from 'react-redux'
 const Comment = ({
   content,
   created_at: created,
@@ -10,9 +10,8 @@ const Comment = ({
   userId,
   onRemove
 }) => {
-  const { getUserById } = UseUser()
-  const { currentUser } = useAuth()
-  const user = getUserById(userId)
+  const currentUserId = useSelector(getCurrenUserId())
+  const user = useSelector(getUserById(userId))
 
   return (
     <div className='bg-light card-body  mb-3'>
@@ -34,7 +33,7 @@ const Comment = ({
                     <span className='small'>- {displayDate(created)}</span>
                   </p>
                   {/* кнопка отображается в том случае если id текущего пользователя === id пользователя, который создал данный комментарий */}
-                  {currentUser._id === userId && (
+                  {currentUserId === userId && (
                     <button
                       className='btn btn-sm text-primary d-flex align-items-center'
                       onClick={() => onRemove(id)}
