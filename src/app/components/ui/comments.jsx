@@ -1,28 +1,36 @@
 import { orderBy } from 'lodash'
-import React from 'react'
+import React, { useEffect } from 'react'
 import CommentsList, { AddCommentForm } from '../common/comments'
-import { useComments } from '../../hooks/useComments'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  createComment,
+  getComments,
+  getCommentsLoadingStatus,
+  loadCommentsList,
+  removeComment
+} from '../../store/comments'
+import { useParams } from 'react-router-dom'
 
 const Comments = () => {
-  const { comments, createComment, removeComment } = useComments()
+  const dispatch = useDispatch()
+  const { userId } = useParams()
+
+  useEffect(() => {
+    dispatch(loadCommentsList(userId))
+  }, [userId]) // чтоб коменты подгружались при пережоде на другого пользователя
+  const isCommentLoading = useSelector(getCommentsLoadingStatus())
+  const comments = useSelector(getComments())
 
   const handleSubmit = (data) => {
-    createComment(data)
-    // api.comments
-    //   .add({ ...data, pageId: userId }) // передаём данные из формы и передаём pageId, чтобы зафиксировать на какой странице этот комментарий должен тображаться
-    //   .then((data) => setComments([...comments, data])) // обновляем текущие данные комментариев (комментарии плюс новые комментарии (data))
+    dispatch(createComment({ ...data, pageId: userId }))
   }
   const handleRemoveComment = (id) => {
-    removeComment(id)
-    // api.comments.remove(id).then((id) => {
-    //   setComments(comments.filter((x) => x._id !== id))
-    // })
+    dispatch(removeComment(id))
   }
   const sortedComments = orderBy(comments, ['created_at'], ['desc']) // комментарии необходимо отстортировать с помощью метода из лодаша
   return (
     <>
       <div className='card mb-2'>
-        {' '}
         <div className='card-body '>
           <AddCommentForm onSubmit={handleSubmit} />
         </div>
@@ -32,10 +40,14 @@ const Comments = () => {
           <div className='card-body '>
             <h2>Comments</h2>
             <hr />
-            <CommentsList
-              comments={sortedComments}
-              onRemove={handleRemoveComment} // если хранить состояние комментария здесь, а не в comment.jsx, то мы поймаем его удаление, обновим наши данные и тем самым отображение тоже обновится
-            />
+            {!isCommentLoading ? (
+              <CommentsList
+                comments={sortedComments}
+                onRemove={handleRemoveComment} // если хранить состояние комментария здесь, а не в comment.jsx, то мы поймаем его удаление, обновим наши данные и тем самым отображение тоже обновится
+              />
+            ) : (
+              'Loading...'
+            )}
           </div>
         </div>
       )}
